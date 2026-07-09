@@ -1,0 +1,5 @@
+#!/usr/bin/python3.12
+import datetime
+now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+with open("/tmp/xbo_hello_world.txt", "w") as f:
+    f.write("hello world from xbo: {0}\n".format(now))
