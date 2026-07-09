@@ -1,5 +1,6 @@
 #!/usr/bin/python3.12
 import datetime
+from pathlib import Path
+
 now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-with open("/tmp/xbo_hello_world.txt", "w") as f:
-    f.write("hello world from xbo: {0}\n".format(now))
+Path("/tmp/xbo_hello_world.txt").write_text(f"hello world from xbo: {now}\n")
