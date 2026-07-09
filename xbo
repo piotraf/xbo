@@ -1,6 +1,35 @@
 #!/usr/bin/python3.12
+import configparser
 import datetime
+import shutil
+import subprocess
 from pathlib import Path
+DEFAULT_XTRABACKUP = "/usr/bin/xtrabackup"
+CONFIG_PATH = Path.home() / ".config/xbo/xbo.conf"
+OUTPUT = Path("/tmp/xbo_hello_world.txt")
 
-now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-Path("/tmp/xbo_hello_world.txt").write_text(f"hello world from xbo: {now}\n")
+
+def load_config() -> configparser.ConfigParser:
+    cfg = configparser.ConfigParser()
+    cfg.read(CONFIG_PATH)  # missing file ignored -> fallbacks apply
+    return cfg
+
+
+def main() -> int:
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cfg = load_config()
+    xb_bin = cfg.get("xtrabackup", "binary", fallback=DEFAULT_XTRABACKUP)
+
+    xb_path = shutil.which(xb_bin)
+    if xb_path is None:
+        OUTPUT.write_text(f"hello world from xbo: {now}\nxtrabackup: NOT FOUND ({xb_bin})\n")
+        return 1
+
+    result = subprocess.run([xb_path, "--version"], capture_output=True, text=True)
+    version = (result.stderr or result.stdout).strip()  # xtrabackup prints version to stderr
+    OUTPUT.write_text(f"hello world from xbo: {now}\nxtrabackup: {xb_path}\n{version}\n")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
