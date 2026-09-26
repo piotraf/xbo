@@ -1,10 +1,24 @@
 # xbo
 
-Percona Xtrabackup wrapper and backup orchestrator, driven per-instance by environment files.
+Percona XtraBackup wrapper and backup orchestrator, driven per-instance by environment files.
 
 ## Status
 
-Early development — not usable at all yet. placeholder script.
+Early development (0.x = alpha) — placeholder logic; the layout, CI and release pipeline are real.
+
+## Install
+
+| Way | Command |
+|---|---|
+| pipx / uv (dev, lab) | `pipx install git+https://github.com/piotraf/xbo` |
+| single file (curl-and-run) | download `xbo` from the [latest release](https://github.com/piotraf/xbo/releases/latest), `chmod +x xbo` |
+| rpm (customers, OL8/9) | planned |
+
+```
+xbo --version
+xbo                                   # mysqld from PATH, xtrabackup chosen by MySQL version
+xbo --mysqld /path/mysqld --xtrabackup /path/xtrabackup
+```
 
 ## Scope
 
@@ -17,6 +31,17 @@ Early development — not usable at all yet. placeholder script.
 
 - RHEL 8.10+ (python3.12, python3.12-PyMySQL)
 - percona-xtrabackup-8.4
+
+## Development
+
+```
+python3.12 -m venv .venv && .venv/bin/pip install -e '.[dev]'
+.venv/bin/ruff check . && .venv/bin/pytest
+```
+
+Branch → PR → CI green (runs on the lab's cidb01) → squash-merge. Releases are cut by
+release-please from Conventional Commits (`feat:`, `fix:`): merge its release PR and the
+tag, GitHub Release and standalone `xbo` file appear.
 
 ## License
 

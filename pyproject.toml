@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xbo"
+version = "0.0.0"            # bumped by release-please; the git tag mirrors it
+description = "Percona XtraBackup wrapper and backup orchestrator, driven per-instance by environment files"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = ["pymysql>=1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+xbo = "xbo.cli:main"
+
+[project.urls]
+Repository = "https://github.com/piotraf/xbo"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

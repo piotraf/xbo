@@ -1,0 +1,39 @@
+# release-please: after feat:/fix: commits land on main it opens/updates a "chore(main): release x.y.z" PR
+# (bumps pyproject version, writes CHANGELOG.md). Merging that PR creates the tag + GitHub Release,
+# and this workflow then attaches the single-file `xbo` for curl-and-run installs.
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      created: ${{ steps.rp.outputs.release_created }}
+      tag: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: rp
+        with:
+          release-type: python
+          prerelease: true          # 0.x = alpha; flip when 1.0 is real
+
+  single-file:
+    needs: release-please
+    if: needs.release-please.outputs.created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the standalone script and attach it to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          { echo '#!/usr/bin/python3.12'; cat src/xbo/cli.py; } > xbo
+          chmod +x xbo
+          gh release upload "${{ needs.release-please.outputs.tag }}" xbo --clobber
