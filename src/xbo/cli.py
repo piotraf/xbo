@@ -16,12 +16,16 @@ are checked even when binary paths are explicitly provided.
 
 import argparse
 import datetime
+import getpass
 import importlib.metadata
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 
-OUTPUT = Path("/tmp/xbo_hello_world.txt")
+# per-user file: a fixed /tmp name collides between users (CI runner vs. admin) — sticky /tmp
+# lets only the owner replace it.
+OUTPUT = Path(tempfile.gettempdir()) / f"xbo_hello_world_{getpass.getuser()}.txt"
 
 
 def version() -> str:
