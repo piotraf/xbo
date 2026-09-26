@@ -17,7 +17,25 @@ Early development (0.x = alpha) — placeholder logic; the layout, CI and releas
 ```
 xbo --version
 xbo                                   # mysqld from PATH, xtrabackup chosen by MySQL version
-xbo --mysqld /path/mysqld --xtrabackup /path/xtrabackup
+xbo --instance prod84                 # from config.toml
+xbo --mysqld /path/mysqld --xtrabackup /path/xtrabackup --my-cnf /path/my.cnf
+```
+
+## Configuration
+
+TOML, lowest → highest precedence: `/etc/xbo/config.toml` → `~/.config/xbo/config.toml` →
+`--config PATH` → CLI flags (`--mysqld`, `--xtrabackup`, `--my-cnf`).
+
+```toml
+mysqld = "mysqld"                       # default binary (from PATH)
+
+[xtrabackup]                            # MySQL major -> xtrabackup binary
+"5.7" = "/opt/xtrabackup-2.4/bin/xtrabackup"
+"8.4" = "/opt/xtrabackup-8.4/bin/xtrabackup"
+
+[instance.prod84]                       # xbo --instance prod84
+mysqld = "/mysqlbin/mysql-8.4.6/bin/mysqld"
+my_cnf = "/db/84/my.cnf"
 ```
 
 ## Scope
