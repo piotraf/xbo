@@ -35,8 +35,9 @@ jobs:
 
       - name: xbo runs against the real MySQL/XtraBackup
         run: |
-          rm -f /tmp/xbo_hello_world.txt
+          out=/tmp/xbo_hello_world_$(id -un).txt
+          rm -f "$out"
           .venv/bin/xbo --version
           .venv/bin/xbo --xtrabackup /usr/bin/xtrabackup   # rpm layout on cidb01, not /opt/xtrabackup-<ver>
-          cat /tmp/xbo_hello_world.txt
-          grep -q '^xtrabackup: /usr/bin/xtrabackup$' /tmp/xbo_hello_world.txt
+          cat "$out"
+          grep -q '^xtrabackup: /usr/bin/xtrabackup$' "$out"
