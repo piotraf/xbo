@@ -1,5 +1,3 @@
-#!/usr/bin/python3.12
-
 """
 xbo - XtraBackup Orchestrator
 
@@ -18,15 +16,24 @@ are checked even when binary paths are explicitly provided.
 
 import argparse
 import datetime
-import subprocess
+import importlib.metadata
 import re
+import subprocess
 from pathlib import Path
 
 OUTPUT = Path("/tmp/xbo_hello_world.txt")
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
+def version() -> str:
+    try:
+        return importlib.metadata.version("xbo")
+    except importlib.metadata.PackageNotFoundError:  # run as a bare script
+        return "0+unpackaged"
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(prog="xbo", description="XtraBackup Orchestrator")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {version()}")
     parser.add_argument(
         "--mysqld",
         default="mysqld",
@@ -36,7 +43,7 @@ def parse_args():
         "--xtrabackup",
         help="Override path to xtrabackup binary",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def get_mysql_version(mysqld: str) -> tuple[str, str]:
@@ -47,17 +54,13 @@ def get_mysql_version(mysqld: str) -> tuple[str, str]:
     )
 
     if result.returncode != 0:
-        raise RuntimeError(
-            f"mysqld --version failed: {mysqld}"
-        )
+        raise RuntimeError(f"mysqld --version failed: {mysqld}")
 
     output = (result.stdout or result.stderr).strip()
     match = re.search(r"\b(\d+\.\d+\.\d+)\b", output)
 
     if not match:
-        raise RuntimeError(
-            f"Cannot determine MySQL version from: {output}"
-        )
+        raise RuntimeError(f"Cannot determine MySQL version from: {output}")
 
     db_version = match.group(1)
     db_major = ".".join(db_version.split(".")[:2])
@@ -78,16 +81,12 @@ def get_xtrabackup_binary(db_major: str) -> Path:
         case "9.7":
             return Path("/opt/xtrabackup-9.7/bin/xtrabackup")
         case _:
-            raise RuntimeError(
-                f"Unsupported MySQL version: {db_major}"
-            )
+            raise RuntimeError(f"Unsupported MySQL version: {db_major}")
 
 
 def get_xtrabackup_version(xb_path: Path) -> str:
     if not xb_path.is_file():
-        raise RuntimeError(
-            f"xtrabackup binary not found: {xb_path}"
-        )
+        raise RuntimeError(f"xtrabackup binary not found: {xb_path}")
 
     result = subprocess.run(
         [str(xb_path), "--version"],
@@ -96,22 +95,18 @@ def get_xtrabackup_version(xb_path: Path) -> str:
     )
 
     if result.returncode != 0:
-        raise RuntimeError(
-            f"xtrabackup --version failed: {xb_path}"
-        )
+        raise RuntimeError(f"xtrabackup --version failed: {xb_path}")
 
     output = (result.stderr or result.stdout).strip()
 
     if not output:
-        raise RuntimeError(
-            f"Cannot determine xtrabackup version: {xb_path}"
-        )
+        raise RuntimeError(f"Cannot determine xtrabackup version: {xb_path}")
 
     return output
 
 
-def main() -> int:
-    args = parse_args()
+def main(argv=None) -> int:
+    args = parse_args(argv)
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
@@ -125,10 +120,7 @@ def main() -> int:
         xb_version = get_xtrabackup_version(xb_path)
 
     except (FileNotFoundError, RuntimeError) as exc:
-        OUTPUT.write_text(
-            f"hello world from xbo: {now}\n"
-            f"ERROR: {exc}\n"
-        )
+        OUTPUT.write_text(f"hello world from xbo: {now}\nERROR: {exc}\n")
         return 1
 
     OUTPUT.write_text(
@@ -139,7 +131,6 @@ def main() -> int:
         f"xtrabackup version: {xb_version}\n"
     )
     return 0
-
 
 
 if __name__ == "__main__":

@@ -1,6 +1,4 @@
-# CI on the lab's self-hosted runner (cidb01: OL8.10, MySQL 8.4, XtraBackup 8.4, python3.12).
-# xbo is a placeholder today, so this is an environment + syntax + smoke-run gate. Grow it as xbo grows:
-# next steps = run xbo against the local MySQL with a test config, then a backup/restore round-trip.
+# CI on the lab's self-hosted runner cidb01 (OL8.10, MySQL 8.4, XtraBackup 8.4, python3.12).
 name: ci
 
 on:
@@ -9,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  smoke:
+  test:
     runs-on: [self-hosted, cidb]
     steps:
       - uses: actions/checkout@v4
@@ -17,18 +15,28 @@ jobs:
       - name: Toolchain present (README requirements)
         run: |
           python3.12 --version
-          python3.12 -c 'import pymysql; print("PyMySQL", pymysql.__version__)'
           xtrabackup --version 2>&1 | grep -o 'xtrabackup version [^ ]*'
 
       - name: MySQL reachable
         run: sudo mysql -Nse 'SELECT VERSION()'
 
-      - name: xbo compiles
-        run: python3.12 -m py_compile xbo
+      - name: Install package + dev tools (venv)
+        run: |
+          python3.12 -m venv .venv
+          .venv/bin/pip install -q -e '.[dev]'
 
-      - name: xbo runs and finds xtrabackup
+      - name: Lint + format check (ruff)
+        run: |
+          .venv/bin/ruff check .
+          .venv/bin/ruff format --check .
+
+      - name: Unit tests (pytest)
+        run: .venv/bin/pytest -q
+
+      - name: xbo runs against the real MySQL/XtraBackup
         run: |
           rm -f /tmp/xbo_hello_world.txt
-          python3.12 xbo --xtrabackup /usr/bin/xtrabackup   # cidb01 has the rpm layout, not /opt/xtrabackup-<ver>
+          .venv/bin/xbo --version
+          .venv/bin/xbo --xtrabackup /usr/bin/xtrabackup   # rpm layout on cidb01, not /opt/xtrabackup-<ver>
           cat /tmp/xbo_hello_world.txt
           grep -q '^xtrabackup: /usr/bin/xtrabackup$' /tmp/xbo_hello_world.txt
