@@ -1,0 +1,31 @@
+# CI on the lab's self-hosted runner (cidb01: OL8.10, MySQL 8.4, XtraBackup 8.4, python3.12).
+# xbo is a placeholder today, so this is an environment + syntax gate. Grow it as xbo grows:
+# next steps = run xbo against the local MySQL with a test config, then a backup/restore round-trip.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, cidb]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain present (README requirements)
+        run: |
+          python3.12 --version
+          python3.12 -c 'import pymysql; print("PyMySQL", pymysql.__version__)'
+          xtrabackup --version 2>&1 | grep -o 'xtrabackup version [^ ]*'
+
+      - name: MySQL reachable
+        run: sudo mysql -Nse 'SELECT VERSION()'
+
+      - name: xbo compiles
+        run: python3.12 -m py_compile xbo
+
+      - name: xbo --help (informational until the CLI exists)
+        continue-on-error: true
+        run: python3.12 xbo --help
