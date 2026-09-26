@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/piotraf/xbo/compare/v0.1.0...v0.1.1) (2026-09-26)
+
+
+### Bug Fixes
+
+* per-user output file; ci: 0.x releases marked pre-release ([#7](https://github.com/piotraf/xbo/issues/7)) ([781a00c](https://github.com/piotraf/xbo/commit/781a00c02dfe8083cac3660e0cb7a59765feff8c))
+
 ## 0.1.0 (2026-09-26)
 
 
