@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 DEFAULT_XTRABACKUP = "/usr/bin/xtrabackup"
 CONFIG_PATH = Path.home() / ".config/xbo/xbo.conf"
-OUTPUT = Path("/tmp/xbo_hello_world.txt")
+OUTPUT = Path("/tmp2/xbo_hello_world.txt")
 
 
 def load_config() -> configparser.ConfigParser:
