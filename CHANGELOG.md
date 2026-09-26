@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/piotraf/xbo/compare/v0.1.1...v0.2.0) (2026-09-26)
+
+
+### Features
+
+* TOML config with per-instance tables ([#9](https://github.com/piotraf/xbo/issues/9)) ([81566bc](https://github.com/piotraf/xbo/commit/81566bccbd2dfdc9b2bfbf95746c1362f110c19b))
+
 ## [0.1.1](https://github.com/piotraf/xbo/compare/v0.1.0...v0.1.1) (2026-09-26)
 
 
