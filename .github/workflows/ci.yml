@@ -29,6 +29,6 @@ jobs:
       - name: xbo runs and finds xtrabackup
         run: |
           rm -f /tmp/xbo_hello_world.txt
-          python3.12 xbo
+          python3.12 xbo --xtrabackup /usr/bin/xtrabackup   # cidb01 has the rpm layout, not /opt/xtrabackup-<ver>
           cat /tmp/xbo_hello_world.txt
           grep -q '^xtrabackup: /usr/bin/xtrabackup$' /tmp/xbo_hello_world.txt

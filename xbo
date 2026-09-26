@@ -138,8 +138,8 @@ def main() -> int:
         f"xtrabackup: {xb_path}\n"
         f"xtrabackup version: {xb_version}\n"
     )
-
     return 0
+
 
 
 if __name__ == "__main__":
