@@ -1,5 +1,5 @@
 # CI on the lab's self-hosted runner (cidb01: OL8.10, MySQL 8.4, XtraBackup 8.4, python3.12).
-# xbo is a placeholder today, so this is an environment + syntax gate. Grow it as xbo grows:
+# xbo is a placeholder today, so this is an environment + syntax + smoke-run gate. Grow it as xbo grows:
 # next steps = run xbo against the local MySQL with a test config, then a backup/restore round-trip.
 name: ci
 
@@ -26,6 +26,9 @@ jobs:
       - name: xbo compiles
         run: python3.12 -m py_compile xbo
 
-      - name: xbo --help (informational until the CLI exists)
-        continue-on-error: true
-        run: python3.12 xbo --help
+      - name: xbo runs and finds xtrabackup
+        run: |
+          rm -f /tmp/xbo_hello_world.txt
+          python3.12 xbo
+          cat /tmp/xbo_hello_world.txt
+          grep -q '^xtrabackup: /usr/bin/xtrabackup$' /tmp/xbo_hello_world.txt
