@@ -24,7 +24,8 @@ Usage examples:
 
     xbo                                     # mysqld from PATH, xtrabackup by MySQL version
     xbo --instance prod84
-    xbo --mysqld /mysqlbin/mysql-8.4.6/bin/mysqld --xtrabackup /opt/percona-xtrabackup-8.4/bin/xtrabackup
+    xbo --mysqld /mysqlbin/mysql-8.4.6/bin/mysqld \\
+        --xtrabackup /opt/percona-xtrabackup-8.4/bin/xtrabackup
 
 The versions reported by mysqld --version and xtrabackup --version are checked even when
 binary paths are explicitly provided.
