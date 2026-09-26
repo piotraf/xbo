@@ -22,7 +22,6 @@ jobs:
         id: rp
         with:
           release-type: python
-          prerelease: true          # 0.x = alpha; flip when 1.0 is real
 
   single-file:
     needs: release-please
@@ -37,3 +36,8 @@ jobs:
           { echo '#!/usr/bin/python3.12'; cat src/xbo/cli.py; } > xbo
           chmod +x xbo
           gh release upload "${{ needs.release-please.outputs.tag }}" xbo --clobber
+      - name: 0.x is alpha → mark the release as pre-release
+        if: startsWith(needs.release-please.outputs.tag, 'v0.')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${{ needs.release-please.outputs.tag }}" --prerelease
